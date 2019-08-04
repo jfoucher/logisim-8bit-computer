@@ -19,9 +19,9 @@ const instructions = {
     ADD:  0b01011,
     SUBI: 0b01100,
     SUB:  0b01101,
-    STO:  0b01110,
-    STPI: 0b10011,
-    STP: 0b10100,
+    STOI:  0b01110,
+    AOUT: 0b10011,
+    STO: 0b10100,
     HLT:  0b11111,
 }
 
@@ -47,45 +47,58 @@ const instructions = {
     // ADD: 'b',
     // SUBI: 'c',
     // SUB: 'd',
-    // STO: 'e',
+    // STOI: 'e',
     // HLT: '1f'
+
+let codes = '';
+for(let i = 0; i<= 127; i++) {
+    codes += (i + 127) + ' ' + i + "\n";
+}
+console.log(codes);
+
+const str = "HELLO WORLD!!"
+let out = '';
+for (let i = 0; i < str.length;i++) {
+    out += 'AOUT ' + (str.charCodeAt(i) + 127) + "\n";
+}
+
+const ascii = codes + out + `
+HLT
+`
 
 const power = `
 # mantissa
 255 3
 # exponent
 254 5
-# copy to ram
-STP 255 255
-STP 254 254
 LDA 255
-STO 253
+STOI 253
 OUTA
 LDA 254
 SUBI 1
-STO 250
+STOI 250
 LDA 255
 SUBI 1
-STO 252
+STOI 252
 :start
 LDA 252
-STO 251
+STOI 251
 :inner
 LDA 253
 ADD 255
-STO 253
+STOI 253
 LDA 251
 SUBI 1
-STO 251
+STOI 251
 LDA 253
 JMPZ next
 JMPI inner
 :next
 OUTA
-STO 255
+STOI 255
 LDA 250
 SUBI 1
-STO 250
+STOI 250
 JMPZ end
 JMPI start
 :end
@@ -96,18 +109,15 @@ const divide = `
 253 112
 254 27
 255 0
-STP 254 254
-STP 253 253
-STP 255 255
 :start
 LDA 253
 SUB 254
 JMPZ end
 JMPC carryend
-STO 253
+STOI 253
 LDA 255
 ADDI 1
-STO 255
+STOI 255
 OUTA
 JMPI start
 :end
@@ -122,18 +132,18 @@ HLT
 `;
 
 const fibo = `
-STPI 255 0
-STPI 254 1
+255 0
+254 1
 LDA 254
 :start
 ADD 255
 JMPC end
 OUTA
-STO 255
+STOI 255
 ADD 254
 JMPC end
 OUTA
-STO 254
+STOI 254
 JMPI start
 :end
 HLT
@@ -165,16 +175,16 @@ HLT
 `
 
 const divisor = `
-STPI 253 15
-STPI 254 15
+253 15
+254 5
 LDA 254
 SUBI 1
-STO 255
+STOI 255
 :start
 LDA 254
 OUTA
 SUB 255
-STO 254
+STOI 254
 JMPC retry
 JMPZ end
 JMPI start
@@ -184,26 +194,26 @@ OUTA
 HLT
 :retry
 LDA 253
-STO 254
+STOI 254
 LDA 255
 SUBI 1
 OUTA
-STO 255
+STOI 255
 JMPI start
 `;
 
 const prime = `
-STPI 253 11
-STPI 254 11
+253 11
+254 11
 LDA 254
 SUBI 1
-STO 255
+STOI 255
 :start
 LDA 254
 OUTA
 JMPZ end
 SUB 255
-STO 254
+STOI 254
 JMPC retry
 JMPI start
 :end
@@ -212,20 +222,14 @@ OUTA
 HLT
 :retry
 LDA 253
-STO 254
+STOI 254
 LDA 255
 SUBI 1
 OUTA
-STO 255
+STOI 255
 JMPI start
 `;
 
-const test = `
-253 11
-254 10
-255 9
-STP 253 255
-`
 
 const assemble = (program) => {
     const lines = program.split("\n").filter(l => l.length > 0);
@@ -313,7 +317,7 @@ const assemble = (program) => {
     return mem;
 }
 
-mem = assemble(fibo);
+mem = assemble(ascii);
 
 const string = "v2.0 raw\n" + mem.join(' ') + "\n";
 

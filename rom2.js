@@ -30,7 +30,7 @@ const RL = 1 << 13   // RAM load
 const S = 1 << 14   // SUBTRACT
 //const FLI = 1 << 15   // FLAGS IN //REPLACED by hardware
 
-//const PRAMIN = 1 << 15  // LOAD PRAM FRom BUS
+const ASCII_OUT = 1 << 15  
 
 
 //Instructions, 5 bits
@@ -48,14 +48,15 @@ const ADDI =    0b01010;
 const ADD =     0b01011;
 const SUBI =    0b01100;
 const SUB =     0b01101;
-const STO =     0b01110;
+const STOI =    0b01110;
 const JMPZ =    0b01111;
 const JMPCNC =  0b10000;
 const JMPZNZ =  0b10001;
 const LDB =     0b10010;
-const STPI =    0b10011;
-const STP  =    0b10100;
+const AOUT =    0b10011;
+const STO =     0b10100;
 const HLT =     0b11111;
+
 
 const loadInstruction = [(MAR_IN | PI), (MO | IR)];
 
@@ -81,7 +82,9 @@ instructions = {
     [ADD]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | RBIN), (ALU | RAIN), (PI)],// ADD -  Add next ram address value to reg A
     [SUBI]: [...loadInstruction, (MAR_IN), (MO | RBIN | PI | S), (ALU | RAIN| S)],            // SUBI - Subtract next ram location from reg A
     [SUB]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | RBIN | S), (ALU | RAIN| S), (PI)],// SUB -  Subtract next ram address value from reg A
-    [STO]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (RAOUT | RL), (PI)],             // STO - store value of register A to RAM address defined in next ram value
+    [STO]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | MAR_IN), (RAOUT | RL), (PI)],             // STO - store value of register A to RAM address defined in next ram value as address
+    [STOI]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (RAOUT | RL), (PI)],        // STOI - store value of register A to RAM address defined in next ram value
+    [AOUT]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | ASCII_OUT), (PI)],          //AOUT - output ascii character
     [HLT]: [...loadInstruction, HALT]   // HLT - Halt execution
 };
 
