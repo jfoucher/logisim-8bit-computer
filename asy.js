@@ -56,7 +56,7 @@ for(let i = 0; i<= 127; i++) {
 }
 console.log(codes);
 
-const str = "HELLO WORLD!!"
+const str = "HELLO WORLD!!\n"
 let out = '';
 for (let i = 0; i < str.length;i++) {
     out += 'AOUT ' + (str.charCodeAt(i) + 127) + "\n";
