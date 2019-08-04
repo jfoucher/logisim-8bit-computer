@@ -62,7 +62,20 @@ for (let i = 0; i < str.length;i++) {
     out += 'AOUT ' + (str.charCodeAt(i) + 127) + "\n";
 }
 
-const ascii = codes + out + `
+const ascii = `
+125 4
+`+ codes + `
+AOUT ${127+12}
+LDAI 4
+STOI 125
+:start
+LDA 125
+SUBI 1
+STOI 125
+JMPZ end
+` + out + `
+JMPI start
+:end
 HLT
 `
 

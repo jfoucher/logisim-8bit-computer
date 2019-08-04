@@ -229,7 +229,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <wire from="(120,670)" to="(150,670)"/>
     <wire from="(1030,460)" to="(1030,470)"/>
     <wire from="(540,810)" to="(540,890)"/>
-    <wire from="(60,40)" to="(60,60)"/>
     <wire from="(680,1080)" to="(730,1080)"/>
     <wire from="(1130,580)" to="(1130,620)"/>
     <wire from="(110,440)" to="(110,460)"/>
@@ -242,8 +241,8 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <wire from="(1280,530)" to="(1280,690)"/>
     <wire from="(1040,430)" to="(1050,430)"/>
     <wire from="(110,590)" to="(110,610)"/>
-    <wire from="(60,70)" to="(140,70)"/>
     <wire from="(610,940)" to="(620,940)"/>
+    <wire from="(60,40)" to="(60,80)"/>
     <wire from="(640,310)" to="(640,370)"/>
     <wire from="(490,590)" to="(520,590)"/>
     <wire from="(60,80)" to="(130,80)"/>
@@ -339,7 +338,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <wire from="(760,870)" to="(790,870)"/>
     <wire from="(600,910)" to="(600,930)"/>
     <wire from="(110,690)" to="(150,690)"/>
-    <wire from="(130,20)" to="(140,20)"/>
     <wire from="(660,930)" to="(680,930)"/>
     <wire from="(320,50)" to="(340,50)"/>
     <wire from="(940,120)" to="(960,120)"/>
@@ -361,7 +359,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <wire from="(600,900)" to="(610,900)"/>
     <wire from="(680,930)" to="(680,970)"/>
     <wire from="(830,60)" to="(830,80)"/>
-    <wire from="(140,20)" to="(140,70)"/>
     <wire from="(70,510)" to="(70,570)"/>
     <wire from="(1170,830)" to="(1170,860)"/>
     <wire from="(80,820)" to="(90,820)"/>
@@ -392,7 +389,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <wire from="(940,310)" to="(940,330)"/>
     <wire from="(50,590)" to="(90,590)"/>
     <wire from="(860,870)" to="(870,870)"/>
-    <wire from="(60,60)" to="(90,60)"/>
     <wire from="(720,370)" to="(830,370)"/>
     <wire from="(160,260)" to="(160,270)"/>
     <wire from="(150,510)" to="(160,510)"/>
@@ -430,7 +426,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <wire from="(420,180)" to="(420,200)"/>
     <wire from="(100,710)" to="(150,710)"/>
     <wire from="(830,80)" to="(930,80)"/>
-    <wire from="(60,70)" to="(60,80)"/>
     <wire from="(550,350)" to="(560,350)"/>
     <wire from="(390,560)" to="(390,590)"/>
     <wire from="(340,110)" to="(370,110)"/>
@@ -467,7 +462,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <wire from="(510,780)" to="(520,780)"/>
     <wire from="(830,310)" to="(830,370)"/>
     <wire from="(790,570)" to="(790,590)"/>
-    <wire from="(90,50)" to="(90,60)"/>
     <wire from="(640,370)" to="(660,370)"/>
     <wire from="(780,850)" to="(780,860)"/>
     <wire from="(350,620)" to="(440,620)"/>
@@ -873,10 +867,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <comp lib="0" loc="(730,190)" name="Tunnel">
       <a name="label" val="RAM_OUT"/>
     </comp>
-    <comp lib="4" loc="(110,30)" name="Counter">
-      <a name="width" val="5"/>
-      <a name="max" val="0x1f"/>
-    </comp>
     <comp lib="0" loc="(550,350)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="DMA_REQ"/>
@@ -923,11 +913,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <comp lib="5" loc="(1130,830)" name="Hex Digit Display"/>
     <comp lib="0" loc="(730,1060)" name="Tunnel">
       <a name="label" val="IR_RESET"/>
-    </comp>
-    <comp lib="0" loc="(110,30)" name="Splitter">
-      <a name="fanout" val="5"/>
-      <a name="incoming" val="5"/>
-      <a name="appear" val="center"/>
     </comp>
     <comp lib="0" loc="(160,490)" name="Tunnel">
       <a name="label" val="PC_INC"/>
@@ -1049,7 +1034,6 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
       <a name="facing" val="east"/>
       <a name="label" val="PCLK"/>
     </comp>
-    <comp lib="0" loc="(80,40)" name="Constant"/>
     <comp lib="5" loc="(150,710)" name="LED">
       <a name="facing" val="east"/>
       <a name="color" val="#62ff65"/>
