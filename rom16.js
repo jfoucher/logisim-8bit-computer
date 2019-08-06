@@ -18,7 +18,7 @@ const O = 1 << 2  // OUTput
 const PL = 1 << 3   // load PC from bus
 const MAR_IN = 1 << 4  // Memory Adress Register in
 //const PO = 1 << 5   // Program Counter out // UNUSED NOW 
-//const MAR_RESET = 1 << 5   // Program RAM out
+const TMP_IN = 1 << 5   // Temp register IN. This register is used to hold part of the 16 bit memory address
 const IR = 1 << 6   // Instruction Register in
 const RAIN = 1 << 7  //Register A IN
 const RAOUT = 1 << 8  //Register A out
@@ -54,30 +54,29 @@ const JMPCNC =  555;
 const JMPZNZ =  777;
 
 const loadInstruction = [(MAR_IN | PI), (MO | IR)];
-const loadRamAdress = [MAR_IN, (MO | RAIN | PI), MAR_IN];
-const loadRamAdressValue = [MAR_IN, (MO | RAIN | PI), MAR_IN];
+const loadRamAdress = [MAR_IN, (MO | TMP_IN | PI), MAR_IN];
+const loadRamAdressValue = [MAR_IN, (MO | TMP_IN | PI), MAR_IN, (MO | MAR_IN)];
 
 //5 bit instructions
 
 instructions = {
     [NOP]: [...loadInstruction, 0],                                                               // NOP - move Reg A to Reg A
     [JMPI]: [...loadInstruction, ...loadRamAdress, (MO | PL)],                                 // JMPI - Load next ram value into program counter
-    [JMP]: [...loadInstruction, ...loadRamAdress, (MO | MAR_IN), (MO | PL)],  // JMP - Load value at next ram address into program counter
-    [JMPC]: [...loadInstruction, (MAR_IN), (MO | PL)],                                // JMPC - Jump on carry. Load value at next ram address into program counter if the carry bit is set = MOV from B to B
-    [JMPZ]: [...loadInstruction, (MAR_IN), (MO | PL)],                                 // JMPZ - Jump to address in next adress if zero flag is set
+    [JMP]: [...loadInstruction, ...loadRamAdressValue, (MO | PL)],  // JMP - Load value at next ram address into program counter
+    [JMPC]: [...loadInstruction, ...loadRamAdress, (MO | PL)],                                // JMPC - Jump on carry. Load value at next ram address into program counter if the carry bit is set = MOV from B to B
+    [JMPZ]: [...loadInstruction, ...loadRamAdress, (MO | PL)],                                 // JMPZ - Jump to address in next adress if zero flag is set
     [JMPCNC]: [...loadInstruction, (MAR_IN | PI)],                                // JMPCNC - What to do when there is no carry
     [JMPZNZ]: [...loadInstruction, (MAR_IN | PI)],                                 // JMPZNZ - What to do when there is not zero
-    [LDAI]: [...loadInstruction, (MAR_IN), (MO | RAIN), (PI)],                          // LDAI - Load next ram location into reg A
-    [LDA]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | RAIN), (PI)],              // LDA -  Load next ram address value into reg A
-
-    [LDBI]: [...loadInstruction, (MAR_IN), (MO | RBIN), (PI)],                          // LDBI - Load next ram location into reg B
-    [LDB]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | RBIN), (PI)],              // LDA -  Load value at next ram address value into reg B
-    [OUT]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | O), (PI)],               // OUT - Load value at next ram address into output
-    [ADDI]: [...loadInstruction, (MAR_IN), (MO | RBIN | PI), (ALU | RAIN)],            // ADDI - Add next ram location to reg A
-    [ADD]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | RBIN), (ALU | RAIN), (PI)],// ADD -  Add next ram address value to reg A
-    [SUBI]: [...loadInstruction, (MAR_IN), (MO | RBIN | PI | S), (ALU | RAIN| S)],            // SUBI - Subtract next ram location from reg A
-    [SUB]: [...loadInstruction, (MAR_IN | PI), (MO | MAR_IN), (MO | RBIN | S), (ALU | RAIN| S | PI)],// SUB -  Subtract next ram address value from reg A
-    [STO]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | MAR_IN), (RAOUT | RL | PI)],             // STO - store value of register A to RAM address defined in next ram value as address
+    [LDAI]: [...loadInstruction, ...loadRamAdress, (MO | RAIN), (PI)],                          // LDAI - Load next ram location into reg A
+    [LDA]: [...loadInstruction, ...loadRamAdressValue, (MO | RAIN), (PI)],              // LDA -  Load next ram address value into reg A
+    [LDBI]: [...loadInstruction, ...loadRamAdress, (MO | RBIN), (PI)],                          // LDBI - Load next ram location into reg B
+    [LDB]: [...loadInstruction, ...loadRamAdressValue, (MO | RBIN), (PI)],              // LDA -  Load value at next ram address value into reg B
+    [OUT]: [...loadInstruction, ...loadRamAdressValue, (MO | O), PI],               // OUT - Load value at next ram address into output
+    [ADDI]: [...loadInstruction, MAR_IN, (MO | TMP_IN | PI), (MO | RBIN | PI), (ALU | RAIN)],            // ADDI - Add next ram location to reg A
+    [ADD]: [...loadInstruction, ...loadRamAdressValue, (MO | RBIN), (ALU | RAIN), (PI)],// ADD -  Add next ram address value to reg A
+    [SUBI]: [...loadInstruction, MAR_IN, (MO | TMP_IN | PI), (MO | RBIN | PI | S), (ALU | RAIN| S)],            // SUBI - Subtract next ram location from reg A
+    [SUB]: [...loadInstruction, ...loadRamAdressValue, (MO | RBIN | S), (ALU | RAIN| S | PI)],// SUB -  Subtract next ram address value from reg A
+    [STO]: [...loadInstruction, ...loadRamAdressValue, (RAOUT | RL | PI)],             // STO - store value of register A to RAM address defined in next ram values
 
     [HLT]: [...loadInstruction, HALT]   // HLT - Halt execution
 };

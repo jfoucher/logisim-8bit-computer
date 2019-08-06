@@ -4,22 +4,22 @@
 const fs = require('fs');
 
 const instructions = {
-    NOP =     0b0000,
-    JMPI =    0b0001,
-    JMP =     0b0010,
-    JMPC =    0b0011,
-    JMPZ =    0b0100,
-    LDA =     0b0101,
-    LDAI =    0b0110,
-    LDB =     0b0111,
-    LDBI =    0b1000,
-    OUT =     0b1001,
-    ADDI =    0b1010,
-    ADD =     0b1011,
-    SUBI =    0b1100,
-    SUB =     0b1101,
-    STO =     0b1110,
-    HLT =     0b1111,
+    NOP:     0,   // 0
+    JMPI:    1,   // 1
+    JMP:     2,   // 2
+    JMPC:    3,   // 3
+    JMPZ:    4,   // 4
+    LDA:     5,   // 5
+    LDAI:    6,   // 6
+    LDB:     7,   // 7
+    LDBI:    8,   // 8
+    OUT:     9,   // 9
+    ADDI:    10,   // a
+    ADD:     11,   // b
+    SUBI:    12,   // c
+    SUB:     13,   // d
+    STO:     14,   // e
+    HLT:     15,   // f
 }
 
 // var keys = Object.keys(instructions);
@@ -53,28 +53,6 @@ for(let i = 0; i<= 127; i++) {
 }
 console.log(codes);
 
-const str = "HELLO WORLD!!\n"
-let out = '';
-for (let i = 0; i < str.length;i++) {
-    out += 'AOUT ' + (str.charCodeAt(i) + 127) + "\n";
-}
-
-const ascii = `
-125 4
-`+ codes + `
-AOUT ${127+12}
-LDAI 4
-STOI 125
-:start
-LDA 125
-SUBI 1
-STOI 125
-JMPZ end
-` + out + `
-JMPI start
-:end
-HLT
-`
 
 const power = `
 # mantissa
@@ -83,7 +61,7 @@ const power = `
 254 5
 LDA 255
 STOI 253
-OUTA
+OUT 253
 LDA 254
 SUBI 1
 STOI 250
@@ -104,7 +82,7 @@ LDA 253
 JMPZ next
 JMPI inner
 :next
-OUTA
+OUT 253
 STOI 255
 LDA 250
 SUBI 1
@@ -128,16 +106,17 @@ STOI 253
 LDA 255
 ADDI 1
 STOI 255
-OUTA
+OUT 255
 JMPI start
 :end
 LDA 255
 ADDI 1
-OUTA
+STOI 255
+OUT 255
 HLT
 :carryend
 LDA 255
-OUTA
+OUT 255
 HLT
 `;
 
@@ -148,41 +127,17 @@ LDA 254
 :start
 ADD 255
 JMPC end
-OUTA
-STOI 255
+STO 255
+OUT 255
 ADD 254
 JMPC end
-OUTA
-STOI 254
+STO 254
+OUT 254
 JMPI start
 :end
 HLT
 `;
 
-const subtract = `
-LDAI 10
-OUTA
-:start
-SUBI 1
-OUTA
-JMPZ end
-JMPI start
-:end
-HLT
-`
-
-const subtract2 = `
-LDAI 0
-SUBI 1
-OUTA
-HLT
-`
-const add = `
-LDAI 5
-ADDI 10
-OUTA
-HLT
-`
 
 const divisor = `
 253 15
@@ -192,7 +147,7 @@ SUBI 1
 STOI 255
 :start
 LDA 254
-OUTA
+OUT 254
 SUB 255
 STOI 254
 JMPC retry
@@ -200,15 +155,15 @@ JMPZ end
 JMPI start
 :end
 LDA 255
-OUTA
+OUT 255
 HLT
 :retry
 LDA 253
 STOI 254
 LDA 255
 SUBI 1
-OUTA
 STOI 255
+OUT 255
 JMPI start
 `;
 
@@ -220,7 +175,7 @@ SUBI 1
 STOI 255
 :start
 LDA 254
-OUTA
+OUT 254
 JMPZ end
 SUB 255
 STOI 254
@@ -228,15 +183,15 @@ JMPC retry
 JMPI start
 :end
 LDA 255
-OUTA
+OUT 255
 HLT
 :retry
 LDA 253
 STOI 254
 LDA 255
 SUBI 1
-OUTA
 STOI 255
+OUT 255
 JMPI start
 `;
 
@@ -244,7 +199,7 @@ JMPI start
 const assemble = (program) => {
     const lines = program.split("\n").filter(l => l.length > 0);
 
-    const mem = new Array(256).fill(0);
+    const mem = new Array(65536).fill(0);
     let address = 0;
     let labels= {}
     let add = 0;
@@ -263,7 +218,8 @@ const assemble = (program) => {
                 //has an argument
                 const sp = l.split(' ');
                 if (typeof instructions[sp[0]] !== 'undefined') {
-                    address += sp.length;
+                    // Each argument is two bytes
+                    address += (sp.length - 1) * 2 + 1;
                 }
             } else {
                 address += 1;
@@ -296,30 +252,19 @@ const assemble = (program) => {
                     mem[i + add] = instructions[sp[0]].toString(16);
                     add++;
                     // Is it a label ?
+                    let ramAddress = parseInt(sp[1], 10);
+
                     if (typeof labels[sp[1]] !== 'undefined') {
                         console.log('is a label ', sp[1]);
-                        mem[i + add] = labels[sp[1]].toString(16);
-                    } else {
-                        console.log('not a label', sp[1], parseInt(sp[1], 10).toString(16));
-                        ramAddress = parseInt(sp[1], 10);
-                        if (ramAddress > 255) {
-                            //This should be two byes, split it
-                            topByte = ramAddress >> 8;
-                            bottomByte = ramAddress & 0xff;
-                            mem[i + add] = bottomByte.toString(16);
-                            add++;
-                            mem[i + add] = topByte.toString(16);
-                        } else {
-                            mem[i + add] = ramAddress.toString(16);
-                        }
-                        
-                        if (typeof sp[2] !== 'undefined'){
-                            // calls that take two arguments
-                            add++;
-                            mem[i + add] = parseInt(sp[2], 10).toString(16);
-                        }
+                        ramAddress = labels[sp[1]];
                     }
-                    
+
+                    //This should be two byes, split it
+                    const topByte = ramAddress >> 8;
+                    const bottomByte = ramAddress & 0xff;
+                    mem[i + add] = bottomByte.toString(16);
+                    add++;
+                    mem[i + add] = topByte.toString(16);
                 }
             } else {
                 
@@ -339,11 +284,19 @@ const assemble = (program) => {
 }
 
 const jmp = `
-JMPI 5000
-
+5000 255
+:start
+LDA 5000
+ADDI 1
+JMPC end
+STO 5001
+OUT 5001
+JMPI start
+:end
+HLT
 `
 
-mem = assemble(jmp);
+mem = assemble(fibo);
 
 const string = "v2.0 raw\n" + mem.join(' ') + "\n";
 
@@ -355,7 +308,7 @@ fs.writeFile("./ram", string, function(err) {
     console.log("RAM file was saved!");
 });
 
-programs = [power, divide, fibo, subtract, divisor, prime].map(p => assemble(p).join(' ')); 
+programs = [power, divide, fibo, divisor, prime].map(p => assemble(p).join(' ')); 
 const pgstring = "v2.0 raw\n" + programs.join(' ') + "\n";
 
 fs.writeFile("./ramROM", pgstring, function(err) {
@@ -367,6 +320,6 @@ fs.writeFile("./ramROM", pgstring, function(err) {
 });
 
 console.log(mem.map((n, i) => {
-    return {i, value: n}
+    return {i, value: parseInt(n, 16)}
 }).filter(n => n.value != 0));
 
