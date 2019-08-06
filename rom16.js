@@ -34,39 +34,35 @@ const ASCII_OUT = 1 << 15
 
 
 //Instructions, 5 bits
-const NOP =     0b00000;
-const JMPI =    0b00001;
-const JMP =     0b00010;
-const JMPC =    0b00011;
-const LDAI =    0b00100;
-const LDA =     0b00101;
-const OUTA =    0b00110;
-const LDBI =    0b00111;
-const OUTI =    0b01000;
-const OUT =     0b01001;
-const ADDI =    0b01010;
-const ADD =     0b01011;
-const SUBI =    0b01100;
-const SUB =     0b01101;
-const STOI =    0b01110;
-const JMPZ =    0b01111;
-const JMPCNC =  0b10000;
-const JMPZNZ =  0b10001;
-const LDB =     0b10010;
-const AOUT =    0b10011;
-const STO =     0b10100;
-const HLT =     0b11111;
-
+const NOP =     0b0000;
+const JMPI =    0b0001;
+const JMP =     0b0010;
+const JMPC =    0b0011;
+const JMPZ =    0b0100;
+const LDA =     0b0101;
+const LDAI =    0b0110;
+const LDB =     0b0111;
+const LDBI =    0b1000;
+const OUT =     0b1001;
+const ADDI =    0b1010;
+const ADD =     0b1011;
+const SUBI =    0b1100;
+const SUB =     0b1101;
+const STO =     0b1110;
+const HLT =     0b1111;
+const JMPCNC =  555;
+const JMPZNZ =  777;
 
 const loadInstruction = [(MAR_IN | PI), (MO | IR)];
-const loadRamAdress = [MAR_IN, (MO | RAIN | PI), MAR_IN, (MO | PL)]
+const loadRamAdress = [MAR_IN, (MO | RAIN | PI), MAR_IN];
+const loadRamAdressValue = [MAR_IN, (MO | RAIN | PI), MAR_IN];
 
 //5 bit instructions
 
 instructions = {
     [NOP]: [...loadInstruction, 0],                                                               // NOP - move Reg A to Reg A
-    [JMPI]: [...loadInstruction, ...loadRamAdress],                                 // JMPI - Load next ram value into program counter
-    [JMP]: [...loadInstruction, (MAR_IN), (MO | RAIN | PI), (MO | MAR_IN), (MO | PL)],                     // JMP - Load value at next ram address into program counter
+    [JMPI]: [...loadInstruction, ...loadRamAdress, (MO | PL)],                                 // JMPI - Load next ram value into program counter
+    [JMP]: [...loadInstruction, ...loadRamAdress, (MO | MAR_IN), (MO | PL)],  // JMP - Load value at next ram address into program counter
     [JMPC]: [...loadInstruction, (MAR_IN), (MO | PL)],                                // JMPC - Jump on carry. Load value at next ram address into program counter if the carry bit is set = MOV from B to B
     [JMPZ]: [...loadInstruction, (MAR_IN), (MO | PL)],                                 // JMPZ - Jump to address in next adress if zero flag is set
     [JMPCNC]: [...loadInstruction, (MAR_IN | PI)],                                // JMPCNC - What to do when there is no carry
