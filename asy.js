@@ -304,9 +304,20 @@ const assemble = (program) => {
                         mem[i + add] = labels[sp[1]].toString(16);
                     } else {
                         console.log('not a label', sp[1], parseInt(sp[1], 10).toString(16));
-    
-                        mem[i + add] = parseInt(sp[1], 10).toString(16);
+                        ramAddress = parseInt(sp[1], 10);
+                        if (ramAddress > 255) {
+                            //This should be two byes, split it
+                            topByte = ramAddress >> 8;
+                            bottomByte = ramAddress & 0xff;
+                            mem[i + add] = bottomByte.toString(16);
+                            add++;
+                            mem[i + add] = topByte.toString(16);
+                        } else {
+                            mem[i + add] = ramAddress.toString(16);
+                        }
+                        
                         if (typeof sp[2] !== 'undefined'){
+                            // calls that take two arguments
                             add++;
                             mem[i + add] = parseInt(sp[2], 10).toString(16);
                         }
@@ -330,7 +341,11 @@ const assemble = (program) => {
     return mem;
 }
 
-mem = assemble(ascii);
+const jmp = `
+JMPI 5000
+`
+
+mem = assemble(jmp);
 
 const string = "v2.0 raw\n" + mem.join(' ') + "\n";
 
