@@ -18,7 +18,7 @@ const O = 1 << 2  // OUTput
 const PL = 1 << 3   // load PC from bus
 const MAR_IN = 1 << 4  // Memory Adress Register in
 //const PO = 1 << 5   // Program Counter out // UNUSED NOW 
-const MAR_RESET = 1 << 5   // Program RAM out
+//const MAR_RESET = 1 << 5   // Program RAM out
 const IR = 1 << 6   // Instruction Register in
 const RAIN = 1 << 7  //Register A IN
 const RAOUT = 1 << 8  //Register A out
@@ -33,7 +33,7 @@ const S = 1 << 14   // SUBTRACT
 const ASCII_OUT = 1 << 15  
 
 
-//Instructions, 5 bits
+//Instructions, 4 bits
 const NOP =     0b0000;
 const JMPI =    0b0001;
 const JMP =     0b0010;
@@ -69,18 +69,16 @@ instructions = {
     [JMPZNZ]: [...loadInstruction, (MAR_IN | PI)],                                 // JMPZNZ - What to do when there is not zero
     [LDAI]: [...loadInstruction, (MAR_IN), (MO | RAIN), (PI)],                          // LDAI - Load next ram location into reg A
     [LDA]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | RAIN), (PI)],              // LDA -  Load next ram address value into reg A
-    [OUTA]: [...loadInstruction, (RAOUT | O)],                                                // OUTA - Output register A
+
     [LDBI]: [...loadInstruction, (MAR_IN), (MO | RBIN), (PI)],                          // LDBI - Load next ram location into reg B
     [LDB]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | RBIN), (PI)],              // LDA -  Load value at next ram address value into reg B
-    [OUTI]: [...loadInstruction, (MAR_IN), (MO | O), (PI)],                           // OUTI - Load next ram location into output
     [OUT]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | O), (PI)],               // OUT - Load value at next ram address into output
     [ADDI]: [...loadInstruction, (MAR_IN), (MO | RBIN | PI), (ALU | RAIN)],            // ADDI - Add next ram location to reg A
     [ADD]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | RBIN), (ALU | RAIN), (PI)],// ADD -  Add next ram address value to reg A
     [SUBI]: [...loadInstruction, (MAR_IN), (MO | RBIN | PI | S), (ALU | RAIN| S)],            // SUBI - Subtract next ram location from reg A
     [SUB]: [...loadInstruction, (MAR_IN | PI), (MO | MAR_IN), (MO | RBIN | S), (ALU | RAIN| S | PI)],// SUB -  Subtract next ram address value from reg A
     [STO]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | MAR_IN), (RAOUT | RL | PI)],             // STO - store value of register A to RAM address defined in next ram value as address
-    [STOI]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (RAOUT | RL), (PI)],        // STOI - store value of register A to RAM address defined in next ram value
-    [AOUT]: [...loadInstruction, (MAR_IN), (MO | MAR_IN), (MO | ASCII_OUT), (PI)],          //AOUT - output ascii character
+
     [HLT]: [...loadInstruction, HALT]   // HLT - Halt execution
 };
 
@@ -91,14 +89,12 @@ instructions = {
 const res = [];
 for (let i = 0; i < 1024; i++) {
     // INSTRUCTION MICROCOUNTER CARRY ZERO
-    //     5bits      3bits      1bit 1bit
+    //     4bits      4bits      1bit 1bit
     let mc = (i >> 2) & 0b111;
     //mc is the microcounter;
 
-    let inst = i >> 5;
+    let inst = i >> 6;
     
-    
-
     let carry = ((i >> 1) & 0b1);
     let zero = i & 0b1;
 

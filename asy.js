@@ -4,25 +4,22 @@
 const fs = require('fs');
 
 const instructions = {
-    NOP:  0b00000,
-    JMPI: 0b00001,
-    JMP:  0b00010,
-    JMPC: 0b00011,
-    JMPZ: 0b01111,
-    LDAI: 0b00100,
-    LDA:  0b00101,
-    OUTA: 0b00110,
-    LDBI: 0b00111,
-    OUTI: 0b01000,
-    OUT:  0b01001,
-    ADDI: 0b01010,
-    ADD:  0b01011,
-    SUBI: 0b01100,
-    SUB:  0b01101,
-    STOI:  0b01110,
-    AOUT: 0b10011,
-    STO: 0b10100,
-    HLT:  0b11111,
+    NOP =     0b0000,
+    JMPI =    0b0001,
+    JMP =     0b0010,
+    JMPC =    0b0011,
+    JMPZ =    0b0100,
+    LDA =     0b0101,
+    LDAI =    0b0110,
+    LDB =     0b0111,
+    LDBI =    0b1000,
+    OUT =     0b1001,
+    ADDI =    0b1010,
+    ADD =     0b1011,
+    SUBI =    0b1100,
+    SUB =     0b1101,
+    STO =     0b1110,
+    HLT =     0b1111,
 }
 
 // var keys = Object.keys(instructions);
@@ -343,6 +340,7 @@ const assemble = (program) => {
 
 const jmp = `
 JMPI 5000
+
 `
 
 mem = assemble(jmp);
