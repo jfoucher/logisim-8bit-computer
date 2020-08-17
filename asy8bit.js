@@ -4,23 +4,27 @@
 const fs = require('fs');
 
 const instructions = {
-    NOP:     0,   // 0
-    JMPI:    1,   // 1
-    JMP:     2,   // 2
-    JMPC:    3,   // 3
-    JMPZ:    4,   // 4
-    LDA:     5,   // 5
-    LDAI:    6,   // 6
-    LDB:     7,   // 7
-    LDBI:    8,   // 8
-    OUT:     9,   // 9
-    ADDI:    10,   // a
-    ADD:     11,   // b
-    SUBI:    12,   // c
-    SUB:     13,   // d
-    STO:     14,   // e
-    HLT:     15,   // f
-    LOUT:     0b10011,
+     NOP:     0b00000,
+     JMPI:    0b00001,
+     JMP:     0b00010,
+     JMPC:    0b00011,
+     LDAI:    0b00100,
+     LDA:     0b00101,
+     OUTA:    0b00110,
+     LDBI:    0b00111,
+     OUTI:    0b01000,
+     OUT:     0b01001,
+     ADDI:    0b01010,
+     ADD:     0b01011,
+     SUBI:    0b01100,
+     SUB:     0b01101,
+     STO:     0b01110,
+     JMPZ:    0b01111,
+     JMPCNC:  0b10000,
+     JMPZNZ:  0b10001,
+     LDB:     0b10010,
+     LOUT:    0b10011,
+     HLT:     0b11111,
 }
 
 // var keys = Object.keys(instructions);
@@ -140,14 +144,12 @@ HLT
 `;
 
 const scr = `
-LDAI 0
-:start
-ADDI 1
-JMPC end
-STO 255
+255 255
+254 254
+253 253
+252 252
+251 251
 LOUT
-JMPI start
-:end
 HLT
 `;
 
@@ -232,7 +234,7 @@ const assemble = (program) => {
                 const sp = l.split(' ');
                 if (typeof instructions[sp[0]] !== 'undefined') {
                     // Each argument is two bytes
-                    address += (sp.length - 1) * 2 + 1;
+                    address += sp.length;
                 }
             } else {
                 address += 1;
@@ -273,11 +275,11 @@ const assemble = (program) => {
                     }
 
                     //This should be two byes, split it
-                    const topByte = ramAddress >> 8;
-                    const bottomByte = ramAddress & 0xff;
-                    mem[i + add] = bottomByte.toString(16);
-                    add++;
-                    mem[i + add] = topByte.toString(16);
+                    //const topByte = ramAddress >> 8;
+                    //const bottomByte = ramAddress & 0xff;
+                    mem[i + add] = ramAddress.toString(16);
+                    //add++;
+                    //mem[i + add] = topByte.toString(16);
                 }
             } else {
                 

@@ -18,7 +18,7 @@ const O = 1 << 2  // OUTput
 const PL = 1 << 3   // load PC from bus
 const MIN = 1 << 4  // Memory Adress Register in
 //const PO = 1 << 5   // Program Counter out // UNUSED NOW 
-const PRAMOUT = 1 << 5   // Program RAM out
+const LEDS_OUT = 1 << 5   // Program RAM out
 const IR = 1 << 6   // Instruction Register in
 const RAIN = 1 << 7  //Register A IN
 const RAOUT = 1 << 8  //Register A out
@@ -53,9 +53,10 @@ const JMPZ =    0b01111;
 const JMPCNC =  0b10000;
 const JMPZNZ =  0b10001;
 const LDB =     0b10010;
+const LOUT =    0b10011;
 const HLT =     0b11111;
 
-const loadInstruction = [(MIN | PI), (PRAMOUT | IR)];
+const loadInstruction = [(MIN | PI), (MO | IR)];
 
 
 //5 bit instructions
@@ -80,7 +81,7 @@ instructions = {
     [SUBI]: [...loadInstruction, (MIN), (MO | RBIN | PI | S), (ALU | RAIN| S), (MCR)],            // SUBI - Subtract next ram location from reg A
     [SUB]: [...loadInstruction, (MIN), (MO | MIN), (MO | RBIN | S), (ALU | RAIN| S), (MCR | PI)],// SUB -  Subtract next ram address value from reg A
     [STO]: [...loadInstruction, (MIN), (MO | MIN), (RAOUT | RL), (MCR | PI)],             // STO - store value of register A to RAM address defined in next ram value
-
+    [LOUT]: [...loadInstruction, (LEDS_OUT), (MCR)],
     [HLT]: [...loadInstruction, HALT]   // HLT - Halt execution
 };
 
@@ -89,7 +90,7 @@ instructions = {
 
 
 const res = [];
-for (let i = 0; i < 511; i++) {
+for (let i = 0; i < 1023; i++) {
     // INSTRUCTION MICROCOUNTER CARRY ZERO
     //     5bits      3bits      1bit 1bit
     let mc = (i >> 2) & 0b111;
@@ -97,8 +98,6 @@ for (let i = 0; i < 511; i++) {
 
     let inst = i >> 5;
     
-    
-
     let carry = ((i >> 1) & 0b1);
     let zero = i & 0b1;
 
@@ -108,12 +107,16 @@ for (let i = 0; i < 511; i++) {
     if (inst == JMPZ && zero == 0) {
         inst = JMPZNZ;
     }
+
+    if (inst === LOUT) {
+        console.log('LOUT', inst);
+    }
     let val = 0;
     res[i] = "0";
     if (typeof instructions[inst] !== 'undefined' && typeof instructions[inst][mc] !== 'undefined') {
         if ((carry && inst === JMPC) || (zero && inst === JMPZ) || (inst !== JMPC && inst !== JMPZ)) {
             //These operations should only do something when a carry or a zero is set.
-            console.log('operation ' + inst.toString(16) + ' at mc ' + mc.toString(10) + ' exists. carry is ' + carry + ' zero flag is '+zero);
+            //console.log('operation ' + inst.toString(16) + ' at mc ' + mc.toString(10) + ' exists. carry is ' + carry + ' zero flag is '+zero);
             //val = instructions[inst][mc].toString(16);
             res[i] = instructions[inst][mc].toString(16);
         } else {
@@ -124,7 +127,7 @@ for (let i = 0; i < 511; i++) {
             }
         }
     } else if (typeof instructions[inst] === 'undefined') {
-        console.log('this instruction does not exist')
+        //console.log('this instruction does not exist')
         c = instructions[NOP];
         if (typeof c[mc] !== 'undefined') {
             res[i] = c[mc].toString(16);
@@ -135,7 +138,7 @@ for (let i = 0; i < 511; i++) {
         res[i] = MCR.toString(16);
     }
 
-    console.log('control word is ' + ("0000000000000000" + parseInt(res[res.length - 1], 16).toString(2)).slice(-16))
+    //console.log('control word is ' + ("0000000000000000" + parseInt(res[res.length - 1], 16).toString(2)).slice(-16))
 }
 
 const string = "v2.0 raw\n" + res.join(' ') + "\n";
